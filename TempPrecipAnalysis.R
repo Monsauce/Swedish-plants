@@ -6,25 +6,41 @@ library(dplyr)
 library(ggplot2)
 library(gridExtra)
 library(tidyr)
+<<<<<<< HEAD
 library(zoo)
 library(data.table)
+=======
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
 
 #### prep data ####
 #set working directory
 setwd("~/Box Sync/Post-Doc/Swedish plants")
 
 #read in data
+<<<<<<< HEAD
 TempPrecip<-read.csv("TempPrecipAvg.csv", stringsAsFactors = FALSE)
+=======
+TempPrecip<-read.csv("TempPrecip.csv", stringsAsFactors = FALSE)
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
 
 #convert blank precipitation to 0 
 TempPrecip$Precipitation[TempPrecip$Precipitation==""] <- 0
 
+<<<<<<< HEAD
 #convert n/a to NA 
 TempPrecip[TempPrecip == "n/a" ] <- NA
 
 #convert odd entries to NA
 TempPrecip[TempPrecip == "." ] <- NA
 TempPrecip[TempPrecip == "?" ] <- NA
+=======
+#remove NA
+TempPrecip <- TempPrecip[-which(TempPrecip$Precipitation == "n/a"), ]
+
+#remove odd entries
+TempPrecip <- TempPrecip[-which(TempPrecip$Precipitation == "."), ]
+TempPrecip <- TempPrecip[-which(TempPrecip$Precipitation == "?"), ]
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
 
 #coerce factors to numbers
 TempPrecip$Precipitation <- as.numeric(as.character(TempPrecip$Precipitation))
@@ -34,8 +50,12 @@ TempPrecip$Date <- TempPrecip$Time
 TempPrecip$Time <- ymd(TempPrecip$Time)
 TempPrecip$Year <- year(TempPrecip$Time)
 TempPrecip$Month <- month(TempPrecip$Time)
+<<<<<<< HEAD
 TempPrecip$Day <- day(TempPrecip$Day)
 TempPrecip$Week<-week(TempPrecip$Time)
+=======
+TempPrecip$Day <- day(TempPrecip$Time)
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
 
 #### plot time series figures ####
 
@@ -83,6 +103,7 @@ Figure.2<-arrangeGrob(Temp.cv.plot,Precip.cv.plot)
 
 #ggsave("Figure.2.pdf", plot=Figure.2, width = 11, height=17)
 
+<<<<<<< HEAD
 #### number of days with positive temperatures #####
 #subset only positive temps
 TempPrecipPositive<-ddply(TempPrecip, .(), .fun= transform, positive = ifelse(Temp_avg> 0,"Y","N"))
@@ -108,6 +129,29 @@ PositiveDaysPlot<-ggplot(TempPrecipPositive, aes(x = Year, y = growdays))+
 
 PositiveDayslm<-lm(growdays~Year,TempPrecipPositive)
 summary(PositiveDayslm)  
+=======
+#### growing season #####
+#subset only positive temps
+Temp.pos<-subset(TempPrecip, Temp_avg > 0)
+
+#get length of growing season by month and year
+Growing.month.season<-ddply(Temp.pos, .(Year, Month), .fun= summarise, length=length(Temp_avg))
+
+Growing.year.season<-ddply(Growing.month.season, .(Year), .fun= summarise, length.year=sum(length))
+
+Growing.season.month.plot<-ggplot(Growing.month.season, aes(x = Year, y = length))+geom_point()+
+  xlab("Year")+ylab("Length of growing season (days)")+
+  facet_wrap(~Month, scales = "free_y")+
+  theme_classic()+stat_smooth(colour="red",se=FALSE, size=0.5, method = "lm")
+
+Growing.year.month.plot<-ggplot(Growing.year.season, aes(x = Year, y = length.year))+geom_point()+
+  xlab("Year")+ylab("Length of growing season (days)")+
+  theme_classic()+stat_smooth(colour="red",se=FALSE, size=0.5, method = "lm")
+
+Figure.3<-arrangeGrob(Growing.season.month.plot,Growing.year.month.plot)
+
+#ggsave("Figure.3.pdf", plot=Figure.3, width = 11, height=17)
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
 
 
 #### snow and ice ####
@@ -122,7 +166,11 @@ Apr.Temp.Precip<-subset(TempPrecip, Month==4)
 Winter.Temp.Precip<-rbind(Nov.Temp.Precip,Dec.Temp.Precip,Jan.Temp.Precip,Feb.Temp.Precip,Mar.Temp.Precip,Apr.Temp.Precip)
 
 #code for days where temp is >0 and precip>0
+<<<<<<< HEAD
 WinterTempPrecip<-ddply(Winter.Temp.Precip, .(), .fun= transform, boiler = ifelse(Temp_avg> 0 & Precipitation >0 ,"Y","N"),
+=======
+Winter.Temp.Precip<-ddply(Winter.Temp.Precip, .(), .fun= transform, boiler = ifelse(Temp_avg> 0 & Precipitation >0 ,"Y","N"),
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
                           snow = ifelse(Temp_avg< 0 & Precipitation >0 ,"Y","N"))
 
 Winter.Temp.Precip.Month<-ddply(Winter.Temp.Precip, .(Year,Month), summarise, 
@@ -190,6 +238,7 @@ Figure.6<-arrangeGrob(Decade.Temp.plot,Decade.Precip.plot)
 
 ggsave("Figure.6.pdf", plot=Figure.6, width = 11, height=9.5)
 
+<<<<<<< HEAD
 #### #of weeks with positive temperatures #####
 #get rolling average temp for each week in data set where Day 1 is January 1, 1913
 
@@ -259,3 +308,5 @@ summary(Snowlm)
 
 
 
+=======
+>>>>>>> 9bd9aab8c861551503bf553ea910c4e692cbc258
